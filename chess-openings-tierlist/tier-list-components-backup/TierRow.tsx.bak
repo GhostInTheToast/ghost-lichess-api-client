@@ -1,0 +1,59 @@
+// Tier row component for displaying openings in a specific tier
+
+import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+
+import { TierListItem, TierRank } from '../types/types';
+import OpeningCard from './OpeningCard';
+
+interface TierRowProps {
+  tier: TierRank;
+  items: TierListItem[];
+  color: string;
+}
+
+const TierRow: React.FC<TierRowProps> = ({ tier, items, color }) => {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `tier-${tier}`,
+  });
+
+  return (
+    <div className={`tier-row ${isOver ? 'tier-row--over' : ''}`}>
+      <div className=\"tier-label\" style={{ backgroundColor: color }}>
+        <span className=\"tier-rank\">{tier}</span>
+        <span className=\"tier-count\">({items.length})</span>
+      </div>
+      
+      <div
+        ref={setNodeRef}
+        className=\"tier-content\"
+        style={{
+          borderColor: isOver ? color : '#ddd',
+          backgroundColor: isOver ? `${color}10` : 'transparent',
+        }}
+      >
+        <SortableContext
+          items={items.map(item => `opening-${item.opening.id}`)}
+          strategy={horizontalListSortingStrategy}
+        >
+          {items.length === 0 ? (
+            <div className=\"tier-empty\">
+              <span>Drop openings here for {tier} tier</span>
+            </div>
+          ) : (
+            items.map(item => (
+              <OpeningCard
+                key={item.opening.id}
+                item={item}
+                isDragging={false}
+              />
+            ))
+          )}
+        </SortableContext>
+      </div>
+    </div>
+  );
+};
+
+export default TierRow;

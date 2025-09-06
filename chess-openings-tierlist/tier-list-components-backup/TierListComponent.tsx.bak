@@ -1,0 +1,256 @@
+// Main tier list component with drag and drop functionality
+
+import React, { useState, useEffect } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+
+import { TierListItem, TierRank, TIER_RANKS, TIER_COLORS } from '../types/types';
+import { ApiService, handleApiError } from '../services/api';
+import TierRow from './TierRow';
+import OpeningCard from './OpeningCard';
+import FilterControls from './FilterControls';
+import './TierListComponent.css';
+
+interface TierListComponentProps {
+  ratingRange?: string;
+  timeControl?: string;
+}
+
+const TierListComponent: React.FC<TierListComponentProps> = ({
+  ratingRange = 'all',
+  timeControl = 'all'
+}) => {
+  const [tierList, setTierList] = useState<TierListItem[]>([]);
+  const [unrankedItems, setUnrankedItems] = useState<TierListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+  const [activeItem, setActiveItem] = useState<TierListItem | null>(null);
+  const [filters, setFilters] = useState({
+    ratingRange,
+    timeControl,
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  useEffect(() => {
+    loadTierList();
+  }, [filters.ratingRange, filters.timeControl]);
+
+  const loadTierList = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const data = await ApiService.getTierList(
+        filters.ratingRange,
+        filters.timeControl
+      );
+      
+      // Separate ranked and unranked items
+      const ranked = data.filter(item => item.tier_rank);
+      const unranked = data.filter(item => !item.tier_rank);
+      
+      setTierList(ranked);
+      setUnrankedItems(unranked);
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const organizeByTiers = () => {
+    const tierGroups: Record<TierRank, TierListItem[]> = {
+      S: [],
+      A: [],
+      B: [],
+      C: [],
+      D: [],
+    };
+
+    tierList.forEach(item => {
+      if (item.tier_rank && TIER_RANKS.includes(item.tier_rank as TierRank)) {
+        tierGroups[item.tier_rank as TierRank].push(item);
+      }
+    });
+
+    // Sort items within each tier by position
+    Object.keys(tierGroups).forEach(tier => {
+      tierGroups[tier as TierRank].sort((a, b) => 
+        (a.tier_position || 0) - (b.tier_position || 0)
+      );
+    });
+
+    return tierGroups;
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const item = [...tierList, ...unrankedItems].find(
+      item => `opening-${item.opening.id}` === active.id
+    );
+    setActiveItem(item || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) {
+      setActiveItem(null);
+      return;
+    }
+
+    const activeItem = [...tierList, ...unrankedItems].find(
+      item => `opening-${item.opening.id}` === active.id
+    );
+
+    if (!activeItem) {
+      setActiveItem(null);
+      return;
+    }
+
+    // Determine which tier the item was dropped into
+    const overTier = over.id.toString().replace('tier-', '') as TierRank;
+    
+    if (TIER_RANKS.includes(overTier)) {
+      // Update item's tier
+      const updatedItem = {
+        ...activeItem,
+        tier_rank: overTier,
+        tier_position: 0, // Will be recalculated
+      };
+
+      // Update local state
+      const newTierList = tierList.filter(item => item.opening.id !== activeItem.opening.id);
+      const newUnrankedItems = unrankedItems.filter(item => item.opening.id !== activeItem.opening.id);
+      
+      newTierList.push(updatedItem);
+      
+      setTierList(newTierList);
+      setUnrankedItems(newUnrankedItems);
+
+      // Save to backend
+      try {
+        await ApiService.updateTierList(
+          [{
+            opening_id: activeItem.opening.id,
+            tier_rank: overTier,
+            tier_position: 0,
+          }],
+          filters.ratingRange,
+          filters.timeControl
+        );
+      } catch (err) {
+        setError(`Failed to save tier list: ${handleApiError(err)}`);
+        // Revert changes on error
+        loadTierList();
+      }
+    }
+
+    setActiveItem(null);
+  };
+
+  const handleFilterChange = (newFilters: { ratingRange: string; timeControl: string }) => {
+    setFilters(newFilters);
+  };
+
+  if (loading) {
+    return (
+      <div className="tier-list-loading">
+        <div className=\"spinner\"></div>
+        <p>Loading tier list...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className=\"tier-list-error\">
+        <h3>Error loading tier list</h3>
+        <p>{error}</p>
+        <button onClick={loadTierList} className=\"retry-button\">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const tierGroups = organizeByTiers();
+
+  return (
+    <div className=\"tier-list-container\">
+      <div className=\"tier-list-header\">
+        <h1>Chess Openings Tier List</h1>
+        <FilterControls
+          currentFilters={filters}
+          onFilterChange={handleFilterChange}
+        />
+      </div>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className=\"tier-list\">
+          {TIER_RANKS.map(tier => (
+            <TierRow
+              key={tier}
+              tier={tier}
+              items={tierGroups[tier]}
+              color={TIER_COLORS[tier]}
+            />
+          ))}
+        </div>
+
+        {unrankedItems.length > 0 && (
+          <div className=\"unranked-section\">
+            <h3>Unranked Openings</h3>
+            <div className=\"unranked-grid\">
+              <SortableContext
+                items={unrankedItems.map(item => `opening-${item.opening.id}`)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {unrankedItems.map(item => (
+                  <OpeningCard
+                    key={item.opening.id}
+                    item={item}
+                    isDragging={activeItem?.opening.id === item.opening.id}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          </div>
+        )}
+
+        <DragOverlay>
+          {activeItem ? (
+            <OpeningCard item={activeItem} isDragging={true} />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </div>
+  );
+};
+
+export default TierListComponent;

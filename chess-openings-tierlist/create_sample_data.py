@@ -1,0 +1,245 @@
+#!/usr/bin/env python3
+"""
+Create sample data for the chess openings tier list to demonstrate the system.
+"""
+
+import json
+import os
+from datetime import datetime
+
+# Create sample opening data based on real chess knowledge
+sample_openings = [
+    {
+        "moves_sequence": ["e4", "e5", "Nf3", "Nc6", "Bb5"],
+        "eco_code": "C60",
+        "opening_name": "Spanish Opening",
+        "white_wins": 187234,
+        "black_wins": 165432,
+        "draws": 89765,
+        "total_games": 442431,
+        "win_rate_white": 0.423,
+        "win_rate_black": 0.374,
+        "draw_rate": 0.203,
+        "performance_score": 52.4,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "c5", "Nf3", "d6", "d4"],
+        "eco_code": "B70",
+        "opening_name": "Sicilian Defense: Dragon Variation",
+        "white_wins": 156789,
+        "black_wins": 134567,
+        "draws": 67890,
+        "total_games": 359246,
+        "win_rate_white": 0.437,
+        "win_rate_black": 0.375,
+        "draw_rate": 0.189,
+        "performance_score": 53.1,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["d4", "d5", "c4", "e6", "Nc3"],
+        "eco_code": "D53",
+        "opening_name": "Queen's Gambit Declined",
+        "white_wins": 198765,
+        "black_wins": 156789,
+        "draws": 112345,
+        "total_games": 467899,
+        "win_rate_white": 0.425,
+        "win_rate_black": 0.335,
+        "draw_rate": 0.240,
+        "performance_score": 54.5,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["d4", "Nf6", "c4", "g6", "Nc3"],
+        "eco_code": "E90",
+        "opening_name": "King's Indian Defense",
+        "white_wins": 123456,
+        "black_wins": 134567,
+        "draws": 78901,
+        "total_games": 336924,
+        "win_rate_white": 0.366,
+        "win_rate_black": 0.399,
+        "draw_rate": 0.234,
+        "performance_score": 48.4,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "e6", "d4", "d5", "Nd2"],
+        "eco_code": "C03",
+        "opening_name": "French Defense: Tarrasch Variation",
+        "white_wins": 89012,
+        "black_wins": 76543,
+        "draws": 45678,
+        "total_games": 211233,
+        "win_rate_white": 0.421,
+        "win_rate_black": 0.362,
+        "draw_rate": 0.216,
+        "performance_score": 52.95,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "c6", "d4", "d5", "Nc3"],
+        "eco_code": "B19",
+        "opening_name": "Caro-Kann Defense: Classical Variation",
+        "white_wins": 67890,
+        "black_wins": 65432,
+        "draws": 43210,
+        "total_games": 176532,
+        "win_rate_white": 0.385,
+        "win_rate_black": 0.371,
+        "draw_rate": 0.245,
+        "performance_score": 50.7,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["Nf3", "Nf6", "c4", "e6", "g3"],
+        "eco_code": "A13",
+        "opening_name": "English Opening: Agincourt Defense",
+        "white_wins": 54321,
+        "black_wins": 48765,
+        "draws": 32109,
+        "total_games": 135195,
+        "win_rate_white": 0.402,
+        "win_rate_black": 0.361,
+        "draw_rate": 0.237,
+        "performance_score": 52.05,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "e5", "Nf3", "Nf6", "Nxe5"],
+        "eco_code": "C42",
+        "opening_name": "Russian Game: Damiano Variation",
+        "white_wins": 43210,
+        "black_wins": 39876,
+        "draws": 21098,
+        "total_games": 104184,
+        "win_rate_white": 0.415,
+        "win_rate_black": 0.383,
+        "draw_rate": 0.202,
+        "performance_score": 51.6,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["d4", "d5", "Nf3", "Nf6", "c4"],
+        "eco_code": "D50",
+        "opening_name": "Queen's Gambit Declined: Modern Variation",
+        "white_wins": 76543,
+        "black_wins": 65432,
+        "draws": 43210,
+        "total_games": 185185,
+        "win_rate_white": 0.413,
+        "win_rate_black": 0.353,
+        "draw_rate": 0.233,
+        "performance_score": 53.0,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "c5", "Nf3", "Nc6", "Bb5"],
+        "eco_code": "B30",
+        "opening_name": "Sicilian Defense: Rossolimo Attack",
+        "white_wins": 87654,
+        "black_wins": 76543,
+        "draws": 45678,
+        "total_games": 209875,
+        "win_rate_white": 0.418,
+        "win_rate_black": 0.365,
+        "draw_rate": 0.218,
+        "performance_score": 52.65,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "d6", "d4", "Nf6", "Nc3"],
+        "eco_code": "B07",
+        "opening_name": "Pirc Defense: Austrian Attack",
+        "white_wins": 34567,
+        "black_wins": 29876,
+        "draws": 18765,
+        "total_games": 83208,
+        "win_rate_white": 0.415,
+        "win_rate_black": 0.359,
+        "draw_rate": 0.225,
+        "performance_score": 52.8,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["d4", "c5", "d5", "e6", "c4"],
+        "eco_code": "A61",
+        "opening_name": "Benoni Defense: Modern Benoni",
+        "white_wins": 45678,
+        "black_wins": 43210,
+        "draws": 23456,
+        "total_games": 112344,
+        "win_rate_white": 0.407,
+        "win_rate_black": 0.385,
+        "draw_rate": 0.209,
+        "performance_score": 51.1,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "e5", "Bc4", "Nf6", "d3"],
+        "eco_code": "C50",
+        "opening_name": "Italian Game: Hungarian Defense",
+        "white_wins": 56789,
+        "black_wins": 49876,
+        "draws": 28765,
+        "total_games": 135430,
+        "win_rate_white": 0.419,
+        "win_rate_black": 0.368,
+        "draw_rate": 0.212,
+        "performance_score": 52.55,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["Nf3", "d5", "d4", "Nf6", "c4"],
+        "eco_code": "D02",
+        "opening_name": "Queen's Pawn Game: London System",
+        "white_wins": 98765,
+        "black_wins": 87654,
+        "draws": 54321,
+        "total_games": 240740,
+        "win_rate_white": 0.410,
+        "win_rate_black": 0.364,
+        "draw_rate": 0.226,
+        "performance_score": 52.3,
+        "collected_at": datetime.now().isoformat()
+    },
+    {
+        "moves_sequence": ["e4", "Nf6", "e5", "Nd5", "d4"],
+        "eco_code": "B03",
+        "opening_name": "Alekhine's Defense: Four Pawns Attack",
+        "white_wins": 23456,
+        "black_wins": 21098,
+        "draws": 12345,
+        "total_games": 56899,
+        "win_rate_white": 0.412,
+        "win_rate_black": 0.371,
+        "draw_rate": 0.217,
+        "performance_score": 52.05,
+        "collected_at": datetime.now().isoformat()
+    }
+]
+
+def main():
+    # Create database directory
+    os.makedirs('database', exist_ok=True)
+    
+    # Save sample data
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"database/openings_data_{timestamp}.json"
+    
+    with open(filename, 'w') as f:
+        json.dump(sample_openings, f, indent=2)
+    
+    print(f"✅ Created sample data with {len(sample_openings)} openings")
+    print(f"📁 Saved to: {filename}")
+    print("\nSample openings included:")
+    for i, opening in enumerate(sample_openings[:5], 1):
+        print(f"  {i}. {opening['eco_code']} {opening['opening_name']}")
+        print(f"     Games: {opening['total_games']:,} | Score: {opening['performance_score']:.1f}%")
+    
+    return filename
+
+if __name__ == "__main__":
+    main()

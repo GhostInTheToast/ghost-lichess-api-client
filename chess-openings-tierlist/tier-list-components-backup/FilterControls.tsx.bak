@@ -1,0 +1,120 @@
+// Filter controls component for tier list
+
+import React, { useState, useEffect } from 'react';
+import { ApiService, handleApiError } from '../services/api';
+import { StatisticsSummary } from '../types/types';
+
+interface FilterControlsProps {
+  currentFilters: {
+    ratingRange: string;
+    timeControl: string;
+  };
+  onFilterChange: (filters: { ratingRange: string; timeControl: string }) => void;
+}
+
+const FilterControls: React.FC<FilterControlsProps> = ({
+  currentFilters,
+  onFilterChange,
+}) => {
+  const [summary, setSummary] = useState<StatisticsSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    loadSummary();
+  }, []);
+
+  const loadSummary = async () => {
+    try {
+      const data = await ApiService.getStatisticsSummary();
+      setSummary(data);
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRatingRangeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onFilterChange({
+      ...currentFilters,
+      ratingRange: event.target.value,
+    });
+  };
+
+  const handleTimeControlChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onFilterChange({
+      ...currentFilters,
+      timeControl: event.target.value,
+    });
+  };
+
+  if (loading) {
+    return <div className=\"filter-controls loading\">Loading filters...</div>;
+  }
+
+  return (
+    <div className=\"filter-controls\">
+      <div className=\"filter-group\">
+        <label htmlFor=\"rating-range\">Rating Range:</label>
+        <select
+          id=\"rating-range\"
+          value={currentFilters.ratingRange}
+          onChange={handleRatingRangeChange}
+          className=\"filter-select\"
+        >
+          <option value=\"all\">All Ratings</option>
+          {summary?.available_rating_ranges.map(range => (
+            <option key={range} value={range}>
+              {range === 'all' ? 'All Ratings' : `${range}+ Rating`}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className=\"filter-group\">
+        <label htmlFor=\"time-control\">Time Control:</label>
+        <select
+          id=\"time-control\"
+          value={currentFilters.timeControl}
+          onChange={handleTimeControlChange}
+          className=\"filter-select\"
+        >
+          <option value=\"all\">All Time Controls</option>
+          {summary?.available_time_controls.map(control => (
+            <option key={control} value={control}>
+              {control === 'all' ? 'All Time Controls' : 
+               control.charAt(0).toUpperCase() + control.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className=\"summary-info\">
+        {summary && (
+          <>
+            <span className=\"info-item\">
+              {summary.total_openings} openings
+            </span>
+            {summary.last_updated && (
+              <span className=\"info-item\">
+                Updated: {new Date(summary.last_updated).toLocaleDateString()}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+
+      {error && (
+        <div className=\"filter-error\">
+          <span>⚠️ {error}</span>
+          <button onClick={loadSummary} className=\"retry-button-small\">
+            Retry
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FilterControls;

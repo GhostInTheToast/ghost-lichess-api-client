@@ -1,0 +1,90 @@
+// Opening card component for displaying individual openings
+
+import React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+import { TierListItem } from '../types/types';
+
+interface OpeningCardProps {
+  item: TierListItem;
+  isDragging: boolean;
+}
+
+const OpeningCard: React.FC<OpeningCardProps> = ({ item, isDragging }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({ id: `opening-${item.opening.id}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging || isSortableDragging ? 0.5 : 1,
+  };
+
+  const { opening, statistics } = item;
+
+  // Calculate win rate percentage for display
+  const winRateWhite = Math.round(statistics.win_rate_white * 100);
+  const winRateBlack = Math.round(statistics.win_rate_black * 100);
+  const drawRate = Math.round(statistics.draw_rate * 100);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`opening-card ${isDragging ? 'opening-card--dragging' : ''}`}
+    >
+      <div className=\"opening-card-header\">
+        <div className=\"opening-eco\">{opening.eco_code || '---'}</div>
+        <div className=\"opening-score\">{statistics.performance_score.toFixed(1)}</div>
+      </div>
+      
+      <div className=\"opening-name\">
+        {opening.name || 'Unknown Opening'}
+      </div>
+      
+      <div className=\"opening-moves\">
+        {opening.moves_string || opening.moves_sequence.join(' ')}
+      </div>
+      
+      <div className=\"opening-stats\">
+        <div className=\"stat-row\">
+          <span className=\"stat-label\">Games:</span>
+          <span className=\"stat-value\">{statistics.total_games.toLocaleString()}</span>
+        </div>
+        
+        <div className=\"stat-row\">
+          <span className=\"stat-label\">White:</span>
+          <span className=\"stat-value\">{winRateWhite}%</span>
+        </div>
+        
+        <div className=\"stat-row\">
+          <span className=\"stat-label\">Black:</span>
+          <span className=\"stat-value\">{winRateBlack}%</span>
+        </div>
+        
+        <div className=\"stat-row\">
+          <span className=\"stat-label\">Draw:</span>
+          <span className=\"stat-value\">{drawRate}%</span>
+        </div>
+        
+        {statistics.average_rating && (
+          <div className=\"stat-row\">
+            <span className=\"stat-label\">Avg Rating:</span>
+            <span className=\"stat-value\">{statistics.average_rating}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default OpeningCard;

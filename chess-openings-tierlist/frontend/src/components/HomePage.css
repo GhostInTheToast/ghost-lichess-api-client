@@ -1,0 +1,346 @@
+/* HomePage.css - Styles for the chess openings home page */
+
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+/* Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page-header h1 {
+  font-size: 2.5em;
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-weight: 300;
+}
+
+.subtitle {
+  font-size: 1.1em;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.stats-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: #95a5a6;
+  font-size: 0.9em;
+}
+
+/* Loading and Error States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ecf0f1;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container h3 {
+  color: #e74c3c;
+  margin-bottom: 10px;
+}
+
+.retry-button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.retry-button:hover {
+  background: #2980b9;
+}
+
+/* Tables Container */
+.tables-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 1024px) {
+  .tables-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Table Sections */
+.table-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.table-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.4em;
+  font-weight: 500;
+}
+
+.table-description {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9em;
+}
+
+/* Tables */
+.table-container {
+  overflow-x: auto;
+}
+
+.openings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.openings-table th {
+  background: #f8f9fa;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.openings-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.openings-table tr:hover {
+  background: #f8f9fa;
+}
+
+.openings-table tr.top-three {
+  background: linear-gradient(90deg, #fff3e0 0%, #ffffff 100%);
+}
+
+.openings-table tr.top-three:hover {
+  background: linear-gradient(90deg, #ffe0b2 0%, #f8f9fa 100%);
+}
+
+/* Column Styles */
+.rank-col { width: 50px; text-align: center; }
+.eco-col { width: 60px; text-align: center; }
+.name-col { width: 200px; }
+.moves-col { width: 140px; }
+.win-rate-col { width: 90px; text-align: center; }
+.games-col { width: 80px; text-align: right; }
+.score-col { width: 70px; text-align: center; }
+
+/* Rank Styling */
+.rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.8em;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+  color: #8b4513;
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+  color: #2c3e50;
+  box-shadow: 0 2px 4px rgba(192, 192, 192, 0.3);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #b8860b 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(205, 127, 50, 0.3);
+}
+
+.rank:not(.rank-1):not(.rank-2):not(.rank-3) {
+  background: #e9ecef;
+  color: #495057;
+}
+
+/* ECO Code */
+.eco-code {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+/* Opening Name */
+.opening-name {
+  font-weight: 500;
+  color: #2c3e50;
+  line-height: 1.3;
+}
+
+/* Moves */
+.moves-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8em;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 4px 6px;
+  border-radius: 3px;
+  border-left: 3px solid #dee2e6;
+}
+
+/* Win Rates */
+.win-rate {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.white-rate {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f1f8f1 100%);
+  color: #2e7d32;
+}
+
+.black-rate {
+  background: linear-gradient(135deg, #f3e5f5 0%, #faf2fb 100%);
+  color: #7b1fa2;
+}
+
+/* Performance Score */
+.performance-score {
+  background: linear-gradient(135deg, #fff3e0 0%, #faf2fb 100%);
+  color: #ef6c00;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* Games Count */
+.games-col {
+  color: #6c757d;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Footer */
+.page-footer {
+  text-align: center;
+  padding: 30px 0;
+  color: #95a5a6;
+  font-size: 0.9em;
+}
+
+.page-footer a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .home-page {
+    padding: 15px;
+  }
+  
+  .page-header {
+    padding: 20px 15px;
+  }
+  
+  .page-header h1 {
+    font-size: 2em;
+  }
+  
+  .table-header {
+    padding: 15px;
+  }
+  
+  .openings-table {
+    font-size: 0.8em;
+  }
+  
+  .openings-table th,
+  .openings-table td {
+    padding: 8px 4px;
+  }
+  
+  /* Hide less important columns on mobile */
+  .score-col,
+  .moves-col {
+    display: none;
+  }
+  
+  .stats-summary {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .eco-col {
+    display: none;
+  }
+  
+  .name-col {
+    width: auto;
+  }
+  
+  .opening-name {
+    font-size: 0.9em;
+  }
+}
